@@ -64,7 +64,9 @@ export default {
     async login(){
       const resp = await this.$axios.post('/login', this.loginInfos)
       if (resp.status === 200){
+        this.$store.commit('login', resp.data.token)
         this.$vs.notify({title:"Connexion", text: "Connexion réussi",color:'success', icon: 'login', position: 'bottom-center'})
+        await this.$router.push('/')
       }
     }
   }

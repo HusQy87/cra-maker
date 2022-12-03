@@ -58,6 +58,7 @@
 
 
 import moment from "moment";
+import axios from "axios"
 import template from '../template.json'
 import {generate} from "@pdfme/generator";
 moment.locale('fr')
@@ -117,12 +118,21 @@ export default {
         window.open(URL.createObjectURL(blob));
       })
     },
-    defineWeekDays(){
+    async defineWeekDays(){
+      const apiResp = await axios.get(`https://calendrier.api.gouv.fr/jours-feries/metropole/${moment().year()}.json`, {Authorization : ''})
       this.week = []
+      console.log(apiResp)
       for (let i = 0; i < 7 ; i++) {
+        let dayDate = moment().week(this.weeknumber).day(i+1)
         let day = {}
         if (i<5){
-          day.hours = 7
+          // eslint-disable-next-line no-prototype-builtins
+          if (apiResp.data.hasOwnProperty(dayDate.format('YYYY-MM-DD'))){
+            day.hours = 0
+          }else {
+            day.hours = 7
+          }
+
         }else {
           day.hours = 0
         }
@@ -134,13 +144,22 @@ export default {
     }
   },
   async mounted() {
-    this.$vs.loading()
-    this.totalweek = moment().weeks()
+    this.$vs.loading({background: '#FFFFFF'})
+    this.totalweek = moment().weeksInYear()
     this.weeknumber = moment().week()
-    this.defineWeekDays()
-    setTimeout(()=> {
-      this.$vs.loading.close()
-    },200)
+    if (this.$store.state.isLoggedIn){
+      const resp = await this.$axios.get('/user/infos')
+      if (resp.data.id){
+        this.nom = resp.data.nom
+        this.prenom = resp.data.prenom
+        this.societe = resp.data.info.societe
+        this.responsable = resp.data.info.responsable
+        this.infos.lieu = resp.data.info.lieu
+        this.infos.mission = resp.data.info.mission
+      }
+    }
+    await this.defineWeekDays()
+    this.$vs.loading.close()
 
   }
 }
