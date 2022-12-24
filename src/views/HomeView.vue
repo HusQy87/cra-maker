@@ -27,7 +27,7 @@
         <vs-col  vs-type="flex" vs-align="center" vs-w="3">{{day.day}}</vs-col>
         <vs-col  vs-type="flex"  vs-align="center" vs-w="3">{{day.date.format('DD/MM/YYYY')}}</vs-col>
         <vs-col  vs-type="flex"  vs-align="center" vs-w="3">
-          <vs-input-number v-model="day.hours" :min="0" :max="24"></vs-input-number>
+          <vs-input-number v-model="day.hours"  :min="0" :max="24"/>
         </vs-col>
         <vs-col  vs-type="flex"  vs-align="center" vs-w="3">
           <vs-input-number v-model="day.nightHours" :min="0" :max="24"></vs-input-number>
@@ -114,14 +114,14 @@ export default {
 
       const inputs = [contextObject]
       generate({template, inputs}).then(pdf => {
-        const blob = new Blob([pdf.buffer], { type: 'application/pdf' });
+        const blob = new Blob([pdf.buffer], { type: 'application/pdf' , name});
         window.open(URL.createObjectURL(blob));
       })
     },
     async defineWeekDays(){
       const apiResp = await axios.get(`https://calendrier.api.gouv.fr/jours-feries/metropole/${moment().year()}.json`, {Authorization : ''})
       this.week = []
-      console.log(apiResp)
+
       for (let i = 0; i < 7 ; i++) {
         let dayDate = moment().week(this.weeknumber).day(i+1)
         let day = {}
@@ -147,15 +147,21 @@ export default {
     this.$vs.loading({background: '#FFFFFF'})
     this.totalweek = moment().weeksInYear()
     this.weeknumber = moment().week()
+    await this.$store.state
     if (this.$store.state.isLoggedIn){
+      console.log(this.$axios)
       const resp = await this.$axios.get('/user/infos')
       if (resp.data.id){
         this.nom = resp.data.nom
         this.prenom = resp.data.prenom
-        this.societe = resp.data.info.societe
-        this.responsable = resp.data.info.responsable
-        this.infos.lieu = resp.data.info.lieu
-        this.infos.mission = resp.data.info.mission
+
+        if (resp.data.info){
+          this.societe = resp.data.info.societe
+          this.responsable = resp.data.info.responsable
+          this.infos.lieu = resp.data.info.lieu
+          this.infos.mission = resp.data.info.mission
+        }
+
       }
     }
     await this.defineWeekDays()

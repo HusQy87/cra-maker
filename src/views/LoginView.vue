@@ -1,5 +1,5 @@
 <template>
-<div id="login">
+<div id="login" class="">
   <div v-if="type === 'login'">
     <vs-row vs-justify="center" style="margin-top: 200px">
       <div style="border: solid 0.1px; padding: 2em">
@@ -63,10 +63,12 @@ export default {
     },
     async login(){
       const resp = await this.$axios.post('/login', this.loginInfos)
-      if (resp.status === 200){
+      if (resp.data.token){
         this.$store.commit('login', resp.data.token)
         this.$vs.notify({title:"Connexion", text: "Connexion réussi",color:'success', icon: 'login', position: 'bottom-center'})
         await this.$router.push('/')
+      }else {
+        this.$vs.notify({title: "Connexion", text:"Mauvaise correspondance mot de passe/email", color:'danger'})
       }
     }
   }

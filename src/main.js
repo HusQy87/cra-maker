@@ -10,7 +10,7 @@ Vue.config.productionTip = false
 
 Vue.use(Vuesax)
 
-Vue.use(axios, {baseUrl: 'http://localhost:80', token: window.localStorage.getItem('token')})
+Vue.use(axios, {baseUrl: process.env.VUE_APP_API_BASE_URL, token: window.localStorage.getItem('token')})
 new Vue({
  router,
  store,

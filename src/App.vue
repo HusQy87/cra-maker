@@ -21,9 +21,7 @@
       <vs-navbar-item index="1" v-else>
         <router-link to="/profil">Profil</router-link>
       </vs-navbar-item>
-      <vs-spacer></vs-spacer>
-      <vs-button color="danger" v-if="$store.state.isLoggedIn" @click="$store.commit('logout')">Déconnexion</vs-button>
-      <vs-button color-text="rgb(255, 255, 255)" color="rgba(255, 255, 255, 0.3)" type="flat" icon="more_horiz"></vs-button>
+      <vs-button color="danger" v-if="$store.state.isLoggedIn" @click="logout">Déconnexion</vs-button>
     </vs-navbar>
     <router-view/>
   </div>
@@ -33,6 +31,12 @@ export default {
   data(){
     return {
       route: 0
+    }
+  },
+  methods: {
+    logout(){
+      this.$store.commit('logout')
+      this.$router.push('/')
     }
   },
   mounted() {
